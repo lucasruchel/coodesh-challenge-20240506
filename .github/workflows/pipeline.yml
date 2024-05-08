@@ -35,8 +35,8 @@ jobs:
           - name: install ansible
             run: sudo apt update && sudo apt install ansible -y
 
-          - name: configure permissions on ssh key
-            run: chmod 600 ${{ secrets.SSH_KEY }}
+          - name: configure ssh key
+            run: echo "${{ secrets.SSH_KEY }}" >> ~/ssh_key && chmod 600 ~/ssh_key
 
           - name: execute ansible playbook
             run: cd nginx && ansible-playbook -i inventory.ini main.yml
