@@ -12,6 +12,21 @@ data "aws_iam_policy_document" "aws-backup-service-assume-role-policy-doc" {
   }
 }
 
+data "aws_iam_policy_document" "aws-cloudwatch_agent-service-assume-role-policy-doc" {
+  statement {
+    sid     = "AssumeServiceRole"
+    actions = ["sts:AssumeRole"]
+    effect  = "Allow"
+
+    principals {
+      type = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
+
+
+
 /* The policies that allow the backup service to take backups and restores */
 data "aws_iam_policy" "aws-backup-service-policy" {
   arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup"
@@ -19,6 +34,10 @@ data "aws_iam_policy" "aws-backup-service-policy" {
 
 data "aws_iam_policy" "aws-restore-service-policy" {
   arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores"
+}
+
+data "aws_iam_policy" "aws-cloudwatch-agent-policy" {
+  arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
 data "aws_caller_identity" "current_account" {}
@@ -46,6 +65,24 @@ resource "aws_iam_role" "aws-backup-service-role" {
   }
 }
 
+/* Roles for taking AWS Cloudwatch Agent */
+resource "aws_iam_role" "aws-cloudwatch-agent-service-role" {
+  name               = "AWSCloudWatchAgentServiceRole"
+  description        = "Allows the AWS CloudWatch Agent to send metrics to Cloudwatch"
+  assume_role_policy = data.aws_iam_policy_document.aws-cloudwatch_agent-service-assume-role-policy-doc.json
+
+
+  tags = {
+    Project = var.projeto
+    Role    = "iam"
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "cloudwatch-agent-service-role-policy" {
+  policy_arn = "${ data.aws_iam_policy.aws-cloudwatch-agent-policy.arn }"
+  role = aws_iam_role.aws-cloudwatch-agent-service-role.name
+}
+
 resource "aws_iam_role_policy_attachment" "backup-service-aws-backup-role-policy" {
   policy_arn = "${ data.aws_iam_policy.aws-backup-service-policy.arn }"
 
@@ -60,4 +97,9 @@ resource "aws_iam_role_policy_attachment" "restore-service-aws-backup-role-polic
 resource "aws_iam_role_policy" "backup-service-pass-role-policy" {
   policy = data.aws_iam_policy_document.pass-role-policy-doc.json
   role   = aws_iam_role.aws-backup-service-role.name
+}
+
+resource "aws_iam_instance_profile" "instance_profile-cloudwatch_agent" {
+  name = aws_iam_role.aws-cloudwatch-agent-service-role.name
+  role = aws_iam_role.aws-cloudwatch-agent-service-role.name
 }

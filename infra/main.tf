@@ -15,6 +15,7 @@ resource "aws_instance" "coodesh_ec2" {
     monitoring = true
 
     key_name = aws_key_pair.coodesh_key_pair.key_name
+    iam_instance_profile = aws_iam_role.aws-cloudwatch-agent-service-role.name
 }
 
 resource "aws_key_pair" "coodesh_key_pair" {
