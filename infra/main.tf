@@ -7,7 +7,8 @@ resource "aws_instance" "coodesh_ec2" {
 
     tags = {
       Name = "Coodesh - nginx"
-      Projeto = "TruckPag"
+      Projeto = "${ var.projeto }"
+      Backup = "true"
     }
 
     vpc_security_group_ids = [ aws_security_group.coodesh_sg.id ]

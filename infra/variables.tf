@@ -17,3 +17,7 @@ variable "vpc" {
   description = "ID of VPC"
   default = "vpc-0627ffd6e4f4d0265"
 }
+
+variable "projeto" {
+  default = "TruckPag"
+}
