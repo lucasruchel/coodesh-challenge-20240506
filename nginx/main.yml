@@ -1,0 +1,12 @@
+---
+- name: Configure webserverr
+  hosts: all
+  become: yes
+  remote_user: ubuntu
+
+
+  tasks:
+    - name: install nginx
+      apt:
+        name: nginx
+        state: present

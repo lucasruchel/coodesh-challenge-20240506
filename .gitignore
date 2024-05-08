@@ -1,0 +1,5 @@
+.terraform.lock.hcl
+.terraform/
+secrets.my
+nginx/*key
+terraform*
