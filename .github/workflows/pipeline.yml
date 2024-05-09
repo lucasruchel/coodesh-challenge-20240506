@@ -9,6 +9,9 @@ jobs:
         runs-on: ubuntu-latest
         env:
           TF_VAR_SSH_PUB_KEY: ${{ secrets.SSH_PUB_KEY }}
+          TF_VAR_ami: ${{ secrets.AWS_AMI}}
+          TF_VAR_subnet_id: ${{ secrets.AWS_SUBNET_ID}}
+          TF_VAR_vpc: ${{ secrets.AWS_VPC_ID}}
         steps:
 
           - name: Configure AWS Credentials
