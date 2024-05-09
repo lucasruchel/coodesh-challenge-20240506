@@ -7,6 +7,8 @@ on: [push]
 jobs:
     deploy_infra:
         runs-on: ubuntu-latest
+        env:
+          TF_VAR_SSH_PUB_KEY: ${{ secrets.SSH_PUB_KEY }}
         steps:
 
           - name: Configure AWS Credentials
@@ -24,13 +26,15 @@ jobs:
 
           - name: configure aws resources
             run: cd infra && terraform init && terraform apply -auto-approve
+            
+            
 
           - name: retrieve public ip of ec2_instance
             run: cd infra && echo ip=$(terraform output -raw ec2_public_ip) >> $GITHUB_ENV
             id: ec2_ip_out
             
           - name: configure inventorio
-            run: sed "s/<EC2_IP>$/${{ env.ip }}/g" nginx/inventory.ini -i && cat nginx/inventory.ini
+            run: sed "s/<EC2_IP>$/${{ env.ip }}/g" config/inventory.ini -i
 
           - name: install ansible
             run: sudo apt update && sudo apt install ansible -y
@@ -39,6 +43,6 @@ jobs:
             run: echo "${{ secrets.SSH_KEY }}" >> ~/ssh_key && chmod 600 ~/ssh_key
 
           - name: execute ansible playbook
-            run: cd nginx && ansible-playbook -i inventory.ini main.yml
+            run: cd config && ansible-playbook -i inventory.ini main.yml
             env:
                 ANSIBLE_HOST_KEY_CHECKING: False

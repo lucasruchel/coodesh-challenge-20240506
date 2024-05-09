@@ -20,7 +20,7 @@ resource "aws_instance" "coodesh_ec2" {
 
 resource "aws_key_pair" "coodesh_key_pair" {
   key_name = "coodesh-key"
-  public_key = file("coodesh-key.pub")
+  public_key = "${var.SSH_PUB_KEY}"
 }
 
 

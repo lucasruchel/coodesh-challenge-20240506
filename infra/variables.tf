@@ -21,3 +21,8 @@ variable "vpc" {
 variable "projeto" {
   default = "TruckPag"
 }
+
+variable "SSH_PUB_KEY" {
+  type      = string
+  sensitive = true
+}
