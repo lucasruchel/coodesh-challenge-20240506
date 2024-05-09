@@ -47,7 +47,7 @@ resource "aws_cloudwatch_dashboard" "demo-dashboard" {
             "properties": {
                 "region": "us-east-1",
                 "title": "webserver error logs",
-                "query": "SOURCE 'error_log' | fields @timestamp, @message, @logStream, @log | sort @timestamp desc | limit 1000 | filter strcontains(@logStream, \"${aws_instance.coodesh_ec2.id}\"" ,
+                "query": "SOURCE 'error_log' | fields @timestamp, @message, @logStream, @log | sort @timestamp desc | limit 1000 | filter strcontains(@logStream, \"${aws_instance.coodesh_ec2.id}\")" ,
                 "view": "table"
             }
         }
