@@ -20,7 +20,11 @@ Este projeto contém arquivos para:
 
 - Ansible
 - Terraform
-- AWS
+- AWS Backups
+- AWS EC2
+- AWS S3
+- AWS Cloudwatch
+- AWS IAM
 - Github Actions
 
 ## Setup
@@ -67,6 +71,31 @@ O pipeline foi criado da seguinte forma:
 
 ![Pipeline and its steps](docs/coodesh-pipeline.drawio.png "Pipeline config to Setup environment")
 
+As etapas do pipeline são as seguintes:
+- **Configure Credentials**: Configura o ambiente no runner do Github com as credenciais armazenadas no secret
+- **Checkout Repository**: Action do Github que puxa o código do repositório para o runner
+- **hashicorp/setup-terraform@v3**: Action oficial da Hashicorp para configuração do ambiente para execução do terraform dentro do runner
+- **Configure AWS resource**: Inicializa o ambiente do terraform e aplica as configurações definidas na pasta **infra/** na conta AWS utilizada. Nessa etapa são configurados todos os recursos necessários para a execução do webserver, bem como backups e o monitoramente através do cloudwatch.
+- **retrive public ip of ec2_instance**: tarefa utilizada recuperar através do terraform o IP público da instância no EC2
+- **Configure inventorio**: Tarefa utilizada para inserir o IP da instância para aplicação das configurações através do ansible
+- **Install ansible**: Tarefa que realiza a instalação do ansible na instância.
+- **Configure SSH key**: Define o arquivo e as permissões do arquivo de chave privada do SSH
+- **Execute Ansible Playbook**: Executa as tarefas do ansible para configuração da aplicação web e instalação do agente do cloudwatch.
 
+
+## Considerações Finais
+
+É importante notar que o projeto foi executado utilizando o free tier da AWS. Alguns recursos não foram criados para não tornar complexa a execução do ambiente.
+
+Dentre os recursos que não foram criados cito:
+- **VPC** para execução da aplicação, é importante utilizar um VPC que não seja o **default** criado pela AWS.
+- **Subnets**: Não foram criadas subnets específicas para aplicação justamente para facilitar a implantação, mas é importante que os servidores web não sejam expostos diretamente na internet, o que permite controlar de forma granular a segurança do ambiente.
+- **Jump Hosts** ou **SSM Jump Host** para facilitar a implantação do pipeline utilizando o github actions foi utilizado o acesso direto através do IP da máquina, prática que não deve ser utilizada em produção, mas para simplificar o ambiente e implantação dos recursos utilizando o ansible.
+
+Melhorias sugeridas para uma aplicação que será aplicada em produção:
+- Criação de **grupos de autoscaling** para permitir que mais réplicas da aplicação sejam lançadas caso ocorra a necessidade, podendo utilizar a opção de Spot Instances para redução de custos.
+- Criação de ALB se o tráfego processado pelo nginx for HTTP/HTTPS, permitindo deixar a instância em uma rede privada. 
+- Criação de regras no WAF para proteção da aplicação e associação ao ALB se for utilizado.
+- Criação de métricas do ALB no Cloudwatch
 
 
