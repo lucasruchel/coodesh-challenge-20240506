@@ -1,64 +1,72 @@
-# Infra Challenge 20240202
+>  This is a challenge by [Coodesh](https://coodesh.com/)
 
-## Introdução
+# Coodesh - DevOps/SRE (Pleno) - Implantação de Infraestrutura
 
-Este é um teste para que possamos ver as suas habilidades como DevOps.
+## Descrição
 
-Nesse teste você deverá configurar um servidor, aplicar os principais recursos de segurança e trabalhar com Infra as Code
+Este projeto contém arquivos para: 
 
-[SPOILER] As instruções de entrega e apresentação do challenge estão no final deste Readme (=
+- implantação de uma instância no EC2 (AWS)
+- Configuração e criação de Dashboard de monitoramento utilizando Terraform
+- Configuração de grupos de segurança para acesso via SSH e acesso da aplicação instalada
+- Configuração de Cloudwatch Agent em instância EC2
+- Instalação de serviço nginx em EC2
+- Configuração e implantação de plano de backup para instância EC2 que possuem a tag com marcação **Backup** = **True** para ser realizado em todo dia útil as 02:00AM
+- Pipeline para implantação de infraestrutura e configurações utilizadas no projeto\*
 
-### Antes de começar
- 
-- Considere como deadline da avaliação a partir do início do teste. Caso tenha sido convidado a realizar o teste e não seja possível concluir dentro deste período, avise a pessoa que o convidou para receber instruções sobre o que fazer.
-- Documentar todo o processo de investigação para o desenvolvimento da atividade (README.md no seu repositório); os resultados destas tarefas são tão importantes do que o seu processo de pensamento e decisões à medida que as completa, por isso tente documentar e apresentar os seus hipóteses e decisões na medida do possível.
+\* *Necessário fazer alguns ajustes no parâmetros do terraform e chaves SSH*
 
-
-## **Parte 1 - Configuração do Servidor**
-
-A sua tarefa consiste em configurar um servidor baseado na nuvem e instalar e configurar alguns componentes básicos.
-
-
-1. Configurar grupo de segurança na AWS
-2. Configuração da redes para o Servidor
-3. Configurar um servidor AWS (recomenda-se o freetier) executando uma versão Ubuntu LTS.
-4. Instalar e configurar qualquer software que você recomendaria em uma configuração de servidor padrão sob as perspectivas de segurança, desempenho, backup e monitorização.
-5. Instalar e configurar o nginx para servir uma página web HTML estática.
-
-
-
-## **Part 2 – Infra as Code**
-
-Como diferencial, você poderá configurar toda a infra-estrutura com ferramentas como:
+### Tecnologias utilizadas
 
 - Ansible
 - Terraform
-- AWS CDK ou CloudFormation
+- AWS
+- Github Actions
 
-Ao ter o projeto executando em um servidor e aplicando as melhores práticas de segurança com grupos de segurança e as configurações de rede criando completamente por código.
+## Setup
+
+- Clonar repositório
+- Configurar os seguintes secrets do GITHUB Actions:
+  -  **SSH_PUB_KEY**: Chave pública do SSH, utilizada para permitir o acesso à máquina criada no EC2
+  -  **SSH_KEY**: Chave privada do SSH, utilizada para permitir que o ansible acesse a máquina criada
+  -  **AWS_SECRET_ACCESS_KEY**: código criado pelo IAM do AWS para permitir o acesso programático aos recursos da AWS
+  -  **AWS_ACCESS_KEY_ID**: Identificação da chave criada
+  -  **AWS_AMI**: AMI da instância que será criada, importante colocar uma máquina que seja Ubuntu 22.04 LTS, as AMI mudam de acordo com cada região que é executada.
+  -  **AWS_SUBNET_ID**:
+  -  **AWS_VPC_ID**:
+  
+
+- Definir as seguintes variáveis ao pipeline:
+    -  **AWS_REGION**: Região que o ambiente será executado.
+        
+            É importante lembrar que a SUBNET_ID e o VPC_ID variam de acordo com a região que será utilizada.
+
+ - Criar Bucket no S3 para armazenar arquivo de estados:
+   - Nome: **s3-coodesh** 
+   - Região: **us-east-1**
+    *Caso queira alterar o nome do bucket e região alterar diretamente no arquivo **infra/providers.tf***
+  
+Estas configurações serão utilizados para criação do pipeline e configuração de todo o ambiente na AWS.
+
+> Para geração das chaves SSH basta seguir os seguintes passos, abra um terminal:
+>> No Linux e macOS, use o atalho usual (geralmente Ctrl+Alt+T) ou a ferramenta de busca do sistema.
+>> No Windows, se você não tiver um terminal instalado, recomendo o Git Bash. Você pode instalá-lo gratuitamente em https://git-scm.com/downloads.
+>>Execute o comando ssh-keygen:
+>>>```bash
+>>>ssh-keygen
+>>>```
+>> Serão feitas algumas perguntas relativas ao caminho onde salvar as chaves, com isso será gerado dois arquivos. Abra cada um deles com um editor de texto e copie o conteúdo de cada um deles para o correpondente secret no github.
+
+* Criação de IAM User para acesso à AWS
+  
+       Nessário observar que o usuário deve ter permissões para acesso aos recursos utilizadas, evitar de colocar uma política permissiva, que permita a alteração de recursos indevidos.
+
+## Pipeline
+
+O pipeline foi criado da seguinte forma:
+
+![Pipeline and its steps](docs/coodesh-pipeline.drawio.png "Pipeline config to Setup environment")
 
 
-## **Part 3 – Continuous Delivery**
 
-Desenhar e construir uma pipeline para apoiar a entrega contínua da aplicação de monitorização construída na Parte 2 no servidor configurado na Parte 1. Descrever a pipeline utilizando um diagrama de fluxo e explicar o objetivo e o processo de seleção usado em cada uma das ferramentas e técnicas específicas que compõem a sua pipeline. 
 
-## Readme do Repositório
-
-- Deve conter o título do projeto
-- Uma descrição sobre o projeto em frase
-- Deve conter uma lista com linguagem, framework e/ou tecnologias usadas
-- Como instalar e usar o projeto (instruções)
-- Não esqueça o [.gitignore](https://www.toptal.com/developers/gitignore)
-- Se está usando github pessoal, referencie que é um challenge by coodesh:  
-
->  This is a challenge by [Coodesh](https://coodesh.com/)
-
-## Finalização e Instruções para a Apresentação
-
-1. Adicione o link do repositório com a sua solução no teste
-2. Verifique se o Readme está bom e faça o commit final em seu repositório;
-3. Envie e aguarde as instruções para seguir. Sucesso e boa sorte. =)
-
-## Suporte
-
-Use a [nossa comunidade](https://discord.gg/rdXbEvjsWu) para tirar dúvidas sobre o processo ou envie uma mensagem diretamente a um especialista no chat da plataforma. 
