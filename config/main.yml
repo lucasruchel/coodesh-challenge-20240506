@@ -11,6 +11,12 @@
         name: nginx
         state: present
 
+    - name: default index file
+      template: 
+        src: index.html
+        dest: /var/www/html/index.html
+        
+
     - name: download cloudwatch
       ansible.builtin.get_url: 
         url: https://amazoncloudwatch-agent.s3.amazonaws.com/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
